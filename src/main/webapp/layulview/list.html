@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>员工信息</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div id="main" style="width:100%;">
+    <!--左侧树形组件-->
+    <div id="left" class="demo-tree demo-tree-box" style="width:15%;float:left;"></div>
+    <!--右侧显示页面-->
+    <div id="right" style="width:85%;float:left;">
+        <center>
+            <form class="layui-form" action="">
+                <div class="layui-inline">
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" placeholder="请输入姓名" autocomplete="off"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">性别</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="sex" value="男" title="男">
+                        <input type="radio" name="sex" value="女" title="女">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">部门</label>
+                    <div class="layui-input-block">
+                        <select name="deptid">
+                            <option value="0"></option>
+                            <option value="1">生产部</option>
+                            <option value="2">销售部</option>
+                            <option value="3">财务部</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+            <table id="demo" lay-filter="test"></table>
+        </center>
+    </div>
+
+</div>
+<script src="/layui/layui.js"></script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="update"><i class="layui-icon layui-icon-edit">编辑</i></a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete"><i class="layui-icon layui-icon-delete">删除</i></a>
+</script>
+<script type="text/html" id="addDemo">
+    <div align="left">
+        <a class="layui-btn layui-btn-xs" lay-event="add"><i class="layui-icon layui-icon-addition">添加</i></a>
+        <a class="layui-btn layui-btn-xs" lay-event="de"><i class="layui-icon layui-icon-delete">删除</i></a>
+    </div>
+</script>
+<script>
+    layui.use(['table', 'layer', 'form', 'tree'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var tree = layui.tree;
+
+        //第一个实例
+        table.render({
+            elem: '#demo'
+            , height: 312
+            , url: '/employee/tb.do' //数据接口
+            , page: true //开启分页
+            , limit: 2
+            , width: 1315
+            , toolbar: '#addDemo'
+            , limits: [1, 2, 3, 4, 5]
+            , cols: [[ //表头
+                {type: 'checkbox', fixed: 'left'}
+                , {type: 'numbers', title: '序列', width: 80, sort: true, align: 'center'}
+                , {field: 'name', title: '姓名', width: 80, align: 'center'}
+                , {field: 'password', title: '密码', width: 80, align: 'center'}
+                , {field: 'sex', title: '性别', width: 80, align: 'center'}
+                , {field: 'age', title: '年龄', width: 80, sort: true, align: 'center'}
+                , {field: 'hobby', title: '爱好', width: 185, align: 'center'}
+                , {
+                    field: 'idcardup',
+                    title: '身份证正',
+                    width: 90,
+                    templet: '<div><img src="{{d.idcardup}}" style="width:70px; height:30px;"></div>',
+                    align: 'center'
+                }
+                , {
+                    field: 'idcarddown',
+                    title: '身份证反',
+                    width: 90,
+                    templet: '<div><img src="{{d.idcarddown}}" style="width:70px; height:30px;"></div>',
+                    align: 'center'
+                }
+                , {field: 'postid', title: '职位', width: 300, align: 'center'}
+                , {
+                    field: 'department',
+                    title: '部门',
+                    width: 110,
+                    templet: '<div>{{d.department.dname}}</div>',
+                    align: 'center'
+                }
+                , {field: '', title: '操作', width: 160, toolbar: '#barDemo', align: 'center'}
+            ]]
+        });
+
+        form.on('submit(formDemo)', function (data) {
+            table.reload('demo', {
+                url: '/employee/tb.do'
+                , where: {
+                    name: data.field.name
+                    , sex: data.field.sex
+                    , deptid: data.field.deptid
+                }
+            });
+            return false;
+        });
+
+        table.on('tool(test)', function (obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            if (layEvent === 'delete') { //删除
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        type: "post",
+                        url: "/employee/delete.do?eid=" + data.eid,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.code == 1) {
+                                layer.msg('<i class="layui-icon layui-icon-face-smile">删除成功</i>');
+                                table.reload('demo', {
+                                    url: '/employee/tb.do'
+                                });
+                            } else {
+                                layer.msg('<i class="layui-icon layui-icon-face-smile">删除失败</i>');
+                            }
+                        },
+                        error: function (err) {
+                            console.log('<i class="layui-icon layui-icon-face-cry">删除失败</i>');
+                        }
+                    });
+                });
+            } else { //编辑
+                layer.open({
+                    title: '修改员工信息',
+                    type: 2,
+                    content: '/employee/update.do?eid=' + data.eid,
+                    area: ['500px', '600px'],
+                    end: function () {
+                        layer.msg('<i class="layui-icon layui-icon-face-smile">修改成功</i>');
+                        table.reload('demo', {
+                            url: '/employee/tb.do'
+                        });
+                    }
+                });
+            }
+        });
+
+        table.on('toolbar(test)', function (obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var checkStatus = table.checkStatus(obj.config.id);
+            var data = checkStatus.data;
+
+            if (layEvent === 'add') {
+                layer.open({
+                    title: '添加员工信息',
+                    type: 2,
+                    content: 'add.html',
+                    area: ['500px', '600px'],
+                    end: function () {
+                        layer.msg('<i class="layui-icon layui-icon-face-smile">添加成功</i>');
+                        table.reload('demo', {
+                            url: '/employee/tb.do'
+                        });
+                    }
+                });
+            } else {
+                if (data.length > 0) {
+                    var ids = '';
+                    for (var i = 0; i < data.length; i++) {
+                        ids += data[i].eid + ","
+                    }
+                    ids = ids.substring(0, ids.length - 1);//字符串中的最后一位逗号去掉
+                    layer.confirm('是否批量删除', function (index) {
+                        $.ajax({
+                            type: "post",
+                            url: "/employee/delete1.do?eids=" + ids,
+                            dataType: "json",
+                            success: function (data) {
+                                if (data.code == 1) {
+                                    layer.msg('<i class="layui-icon layui-icon-face-smile">批量删除成功</i>');
+                                    table.reload('demo', {
+                                        url: '/employee/tb.do'
+                                    });
+                                } else {
+                                    layer.msg('<i class="layui-icon layui-icon-face-smile">批量删除失败</i>');
+                                }
+                            },
+                            error: function (err) {
+                                console.log('<i class="layui-icon layui-icon-face-cry">批量删除失败</i>');
+                            }
+                        });
+                    });
+                } else {
+                    layer.msg('<i class="layui-icon layui-icon-face-smile">请选择一行</i>');
+                }
+            }
+        });
+
+        $(function () {
+            $.get("/employee/dept.do", function (data) {
+                dept = data;
+                tree.render({
+                    elem: '#left'  //绑定元素
+                    , data: data
+                    , click: function (obj) {
+                        var did=obj.data.id;
+                        table.reload('demo', {
+                            url: '/employee/tree.do?deptid='+did
+                        });
+                    }
+                });
+            });
+        });
+
+
+    });
+</script>
+</body>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加员工</title>
+</head>
+<body>
+<center>
+    <h2><font color="blue">添加员工</font></h2>
+    <form action="/employee/emp.do" method="post" enctype="multipart/form-data">
+        姓名：<input type="text" name="name"/><br>
+        年龄：<input type="text" name="age"/><br>
+        性别：
+        男 <input type="radio" value="男" checked name="sex"/>
+        女 <input type="radio" value="女" name="sex"/><br>
+        爱好：
+        看书 <input type="checkbox" value="看书" name="hobby"/>
+        打篮球 <input type="checkbox" value="打篮球" name="hobby"/>
+        跑步 <input type="checkbox" value="跑步" name="hobby"/>
+        打游戏 <input type="checkbox" value="打游戏" name="hobby"/><br>
+        身份证正：<input type="file" name="up"/><br>
+        身份证反：<input type="file" name="down"/><br>
+        职位：
+        <span th:each="a:${list1}">
+            [[${a.pname}]]<input type="checkbox" th:value="${a.pid}" name="postid"/>
+        </span><br>
+        部门：
+        <select name="deptid">
+            <option th:each="b:${list}" th:value="${b.did}">[[${b.dname}]]</option>
+        </select><br>
+        <input type="submit" style="background-color: deeppink" value="添加"/>
+    </form>
+</center>
+</body>
+</html>

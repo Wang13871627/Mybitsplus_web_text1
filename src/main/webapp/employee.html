@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>员工信息</title>
+</head>
+<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+    var add = function () {
+        window.location.href = "/employee/empa.do";
+    }
+</script>
+<body>
+<center>
+    <h2><font color="blue">员工信息</font></h2>
+    <form action="/employee/emps.do" method="post">
+        <input type="button" style="background-color: aqua" onclick="add()" value="添加"/>&nbsp;&nbsp;
+        姓名：<input type="text" name="name"/>
+        职位：
+        <span th:each="c:${list2}">
+            [[${c.pname}]]<input type="checkbox" name="postid" th:value="${c.pid}"/>
+        </span>
+        部门：
+        <select name="deptid">
+            <option value="0">请选择</option>
+            <option th:each="a:${list1}" th:value="${a.did}">[[${a.dname}]]</option>
+        </select>
+        <input type="submit" value="搜索"/>
+    </form>
+    <font th:if="${list.size()==0}" color="#bdb76b">当前无员工信息</font>
+    <div th:if="${list.size()!=0}">
+        <table width="70%" border="1">
+            <tr>
+                <th>编号</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>年龄</th>
+                <th>爱好</th>
+                <th>身份证正</th>
+                <th>身份证背</th>
+                <th>职位</th>
+                <th>部门</th>
+                <th colspan="2">操作</th>
+            </tr>
+            <tr align="center" th:each="b,s:${list}">
+                <td>[[${s.count}]]</td>
+                <td>[[${b.name}]]</td>
+                <td>[[${b.sex}]]</td>
+                <td>[[${b.age}]]</td>
+                <td>[[${b.hobby}]]</td>
+                <td>
+                    <img style="width:80px;height:30px" th:src="${b.idcardup}"/>
+                </td>
+                <td>
+                    <img style="width:80px;height:30px" th:src="${b.idcarddown}"/>
+                </td>
+                <td>[[${b.postid}]]</td>
+                <td>[[${b.department.dname}]]</td>
+                <td align="center">
+                    <form action="/employee/emp1.do" method="post">
+                        <input type="hidden" name="eid" th:value="${b.eid}">
+                        <input type="submit" value="修改"/>
+                    </form>
+                </td>
+                <td align="center">
+                    <form action="/employee/emp.do" method="post">
+                        <input type="hidden" name="_method" value="DELETE"/>
+                        <input type="hidden" name="eid" th:value="${b.eid}">
+                        <input type="submit" value="删除"/>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</center>
+</body>
+</html>

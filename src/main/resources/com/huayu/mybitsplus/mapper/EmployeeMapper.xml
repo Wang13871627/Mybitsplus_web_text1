@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huayu.mybitsplus.mapper.EmployeeMapper" >
+  <select id="queryall" parameterType="employee" resultMap="emp_dept">
+    select * from employee e,department d where e.deptid=d.did
+    <if test="name!=null and name!=''">
+        and name like '%${name}%'
+    </if>
+    <if test="postid!=null and postid!=''">
+      and postid=#{postid}
+    </if>
+    <if test="deptid!=null and deptid!='' and deptid!=0">
+      and deptid=#{deptid}
+    </if>
+  </select>
+
+  <resultMap id="emp_dept" type="com.huayu.mybitsplus.vo.Emp">
+    <result column="did" property="department.did"></result>
+    <result column="dname" property="department.dname"></result>
+  </resultMap>
+
+  <select id="query" parameterType="employee" resultMap="emp_dept_query">
+    select * from employee e,department d where e.deptid=d.did
+    <if test="emp.deptid!=null and emp.deptid!=''">
+      and deptid=#{emp.deptid}
+    </if>
+    <if test="emp.name!=null and emp.name!=''">
+      and name like '%${emp.name}%'
+    </if>
+    <if test="emp.sex!=null and emp.sex!=''">
+      and sex=#{emp.sex}
+    </if>
+    <if test="emp.deptid!=null and emp.deptid!='' and emp.deptid!=0">
+      and deptid=#{emp.deptid}
+    </if>
+  </select>
+
+  <resultMap id="emp_dept_query" type="com.huayu.mybitsplus.vo.Emp">
+    <result column="did" property="department.did"></result>
+    <result column="dname" property="department.dname"></result>
+  </resultMap>
+
+  <select id="selectone" parameterType="String" resultType="employee">
+    select * from employee where name=#{value}
+  </select>
+
+</mapper>

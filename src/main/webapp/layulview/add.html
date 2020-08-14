@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加员工信息</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<center>
+    <form class="layui-form" action="/employee/add2.do">
+        <div class="layui-form-item">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-block">
+                <input type="text" style="width:300px;" name="name" lay-verify="name" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+                <input type="password" style="width:300px;" name="password" lay-verify="password" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-block">
+                <input type="radio" name="sex" checked value="男" title="男">
+                <input type="radio" name="sex" value="女" title="女">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">年龄</label>
+            <div class="layui-input-block">
+                <input type="text" style="width:300px;" name="age" lay-verify="age" placeholder="请输入年龄" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">爱好</label>
+            <input type="checkbox" name="hobby" value="看书" title="看书" lay-skin="primary">
+            <input type="checkbox" name="hobby" value="打篮球" title="打篮球" lay-skin="primary">
+            <input type="checkbox" name="hobby" value="打游戏" title="打游戏" lay-skin="primary">
+            <input type="checkbox" name="hobby" value="跑步" title="跑步" lay-skin="primary">
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">身份证正</label>
+            <div class="layui-upload">
+                <input type="hidden" name="idcardup" lay-verify="up" id="img"/>
+                <img style="width:90px;height:38px;" class="layui-upload-img" id="up">
+                <button type="button" class="layui-btn" id="test">上传图片</button>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">身份证反</label>
+            <div class="layui-upload">
+                <input type="hidden" name="idcarddown" lay-verify="down" id="img1"/>
+                <img style="width:90px;height:38px;" class="layui-upload-img" id="down">
+                <button type="button" class="layui-btn" id="test1">上传图片</button>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">职位</label>
+            <span id="post">
+
+            </span>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">部门</label>
+            <div class="layui-input-block">
+                <select id="deptid" name="deptid">
+
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</center>
+<script src="/layui/layui.js"></script>
+<script type="text/html" id="picture">
+    <i class="layui-icon layui-icon-face-smile">上传成功</i>
+</script>
+<script type="text/html" id="picture1">
+    <i class="layui-icon layui-icon-face-cry">上传失败</i>
+</script>
+<script>
+    layui.use(['upload','form'], function () {
+        var form = layui.form;
+        var $=layui.jquery;
+        var upload=layui.upload;
+
+        $(function(){
+            $.ajax({
+                type: "get",
+                url: "/employee/add.do",
+                dataType: "json",
+                success: function(data){
+                    var a="";
+                    for (var i = 0;i<data.length;i++) {
+                        a+="<input type='checkbox' name='postid' value='"+data[i].pid+"' title='"+data[i].pname+"'/>";
+                    }
+                    $("#post").append(a);
+                    form.render();
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/employee/add1.do",
+                dataType: "json",
+                success: function(data){
+                    var a="";
+                    for (var i = 0; i <data.length ; i++) {
+                        a+="<option value='"+data[i].did+"'>"+data[i].dname+"</option>";
+                    }
+                    $("#deptid").append(a);
+                    form.render();
+                }
+            });
+        });
+
+        form.on('submit(formDemo)', function(data){
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+        });
+
+        upload.render({
+            elem: '#test'
+            ,url: '/employee/pic.do'
+            ,done: function(res){
+                if(res.code == 1){
+                    layer.msg('<i class="layui-icon layui-icon-face-smile">上传成功</i>');
+                    $('#up').attr("src",res.data);
+                    $('#img').attr("value",res.data);
+                }else{
+                    return layer.msg('<i class="layui-icon layui-icon-face-cry">上传失败</i>');
+                }
+            }
+            ,error: function(){
+                layer.msg('<i class="layui-icon layui-icon-face-cry">上传失败</i>');
+            }
+        });
+
+        upload.render({
+            elem: '#test1'
+            ,url: '/employee/pic1.do'
+            ,done: function(res){
+                if(res.code == 1){
+                    layer.msg('<i class="layui-icon layui-icon-face-smile">上传成功</i>');
+                    $('#down').attr("src",res.data);
+                    $('#img1').attr("value",res.data);
+                }else{
+                    return layer.msg('<i class="layui-icon layui-icon-face-cry">上传失败</i>');
+                }
+            }
+            ,error: function(){
+                layer.msg('<i class="layui-icon layui-icon-face-cry">上传失败</i>');
+            }
+        });
+
+        form.verify({
+            name: function(value, item){ //value：表单的值、item：表单的DOM对象
+                if(value.length==0){
+                    return '用户名不能为空';
+                }
+                if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+                    return '用户名不能有特殊字符';
+                }
+                if(/(^\_)|(\__)|(\_+$)/.test(value)){
+                    return '用户名首尾不能出现下划线\'_\'';
+                }
+                if(/^\d+\d+\d$/.test(value)){
+                    return '用户名不能全为数字';
+                }
+                if(value.length>5){
+                    return '用户名不能超过4个字';
+                }
+            }
+            ,age:function(value,item) {
+                if(value.length==0){
+                    return '年龄不能为空';
+                }
+                if(!/^(?:[1-9][0-9]?|1[01][0-9]|120)$/.test(value)){
+                    return '请输入正确的年龄';
+                }
+            }
+            ,up:function(value,item) {
+                if(value.length==0){
+                    return '请上传身份证正面信息';
+                }
+            }
+            ,down:function(value,item) {
+                if(value.length==0){
+                    return '请上传身份证反面信息';
+                }
+            }
+            ,password:function (value) {
+                if(value.length==0){
+                    return '密码不能为空';
+                }
+                if(/^(\w){6,20}$/.test(value)){
+                    return '密码格式6-20个字母、数字、下划线';
+                }
+            }
+        });
+
+    });
+
+
+</script>
+</body>

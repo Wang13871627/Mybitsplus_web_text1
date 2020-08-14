@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改员工</title>
+</head>
+<body>
+<center>
+    <h2><font color="blue">修改员工</font></h2>
+    <form action="/employee/emp.do" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="PUT"/>
+        <input type="hidden" name="eid" th:value="${emp.eid}"/>
+        姓名：<input type="text" name="name" th:value="${emp.name}"/><br>
+        年龄：<input type="text" name="age" th:value="${emp.age}"/><br>
+        性别：
+        <span th:if="${emp.sex=='男'}">
+            男 <input type="radio" value="男" checked name="sex"/>
+            女 <input type="radio" value="女" name="sex"/>
+        </span>
+        <span th:if="${emp.sex!='男'}">
+            男 <input type="radio" value="男" name="sex"/>
+            女 <input type="radio" value="女" checked name="sex"/>
+        </span><br/>
+        爱好：
+        <span th:each="c:${list2}">
+            <span th:if="${emp.hobby.contains(c)}">
+                [[${c}]]<input type="checkbox" checked th:value="${c}" name="hobby"/>
+            </span>
+            <span th:if="${!emp.hobby.contains(c)}">
+                [[${c}]]<input type="checkbox" th:value="${c}" name="hobby"/>
+            </span>
+        </span><br>
+        <img style="width:80px;height:30px" th:src="${emp.idcardup}"/><br>
+        身份证正：<input type="file" name="up"/><br>
+        <img style="width:80px;height:30px" th:src="${emp.idcarddown}"/><br>
+        身份证反：<input type="file" name="down"/><br>
+        职位：
+        <span th:each="a:${list1}">
+            <span th:if="${emp.postid.contains(a.pname)}">
+                [[${a.pname}]]<input type="checkbox" checked th:value="${a.pid}" name="postid"/>
+            </span>
+            <span th:if="${!emp.postid.contains(a.pname)}">
+                [[${a.pname}]]<input type="checkbox" th:value="${a.pid}" name="postid"/>
+            </span>
+        </span><br>
+        部门：
+        <select name="deptid">
+            <span th:each="b:${list}">
+                <option th:if="${emp.deptid==b.did}" th:value="${b.did}" selected>[[${b.dname}]]</option>
+                <option th:if="${emp.deptid!=b.did}" th:value="${b.did}">[[${b.dname}]]</option>
+            </span>
+        </select><br>
+        <input type="submit" style="background-color: deeppink" value="修改"/>
+    </form>
+</center>
+</body>
+</html>
